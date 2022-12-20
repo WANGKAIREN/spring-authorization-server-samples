@@ -18,6 +18,8 @@ package com.example.messagesresource.web;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
+
 /**
  * @author Joe Grandja
  * @since 0.0.1
@@ -27,6 +29,6 @@ public class MessagesController {
 
 	@GetMapping("/messages")
 	public String[] getMessages() {
-		return new String[] {"Message 1", "Message 2", "Message 3"};
+		return new String[] {"Message 1", "Message 2", "Message 3", LocalDateTime.now().toString()};
 	}
 }

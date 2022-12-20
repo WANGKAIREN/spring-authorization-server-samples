@@ -38,7 +38,7 @@ import java.util.Set;
 /**
  * @author Daniel Garnier-Moiroux
  */
-//@Controller
+@Controller
 public class AuthorizationConsentController {
 	private final RegisteredClientRepository registeredClientRepository;
 	private final OAuth2AuthorizationConsentService authorizationConsentService;
