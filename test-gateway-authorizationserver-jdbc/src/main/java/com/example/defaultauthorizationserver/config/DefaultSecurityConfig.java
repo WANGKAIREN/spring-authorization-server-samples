@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.example.customconsentauthorizationserver.config;
+package com.example.defaultauthorizationserver.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -28,6 +28,7 @@ import static org.springframework.security.config.Customizer.withDefaults;
 
 /**
  * @author Joe Grandja
+ * @since 0.1.0
  */
 @EnableWebSecurity
 public class DefaultSecurityConfig {

@@ -4,6 +4,20 @@ spring:
   application:
     name: gateway-resource
 
+#  datasource:
+#    driver-class-name: com.mysql.cj.jdbc.Driver
+#    url: jdbc:mysql://116.63.69.59:3306/test?useSSL=false&useUnicode=true&characterEncoding=utf-8&autoReconnect=true&serverTimezone=Asia/Shanghai
+#    username: root
+#    password: ciglink2020!@#
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          #issuer-uri: http://127.0.0.1:30000/issuer
+          jwk-set-uri: http://127.0.0.1:30000/oauth2/jwks
+
+
 logging:
   level:
     root: INFO
