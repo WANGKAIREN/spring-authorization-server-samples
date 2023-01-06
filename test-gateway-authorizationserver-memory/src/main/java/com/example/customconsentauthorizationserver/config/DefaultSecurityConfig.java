@@ -1,20 +1,7 @@
-/*
- * Copyright 2020-2021 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.example.customconsentauthorizationserver.config;
 
+import com.example.customconsentauthorizationserver.security.RedirectLoginAuthenticationSuccessHandler;
+import com.example.customconsentauthorizationserver.security.UnauthorizedAuthenticationEntryPoint;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -23,33 +10,67 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
-
-import static org.springframework.security.config.Customizer.withDefaults;
+import org.springframework.security.web.authentication.AuthenticationEntryPointFailureHandler;
 
 /**
- * @author Joe Grandja
+ * 认证 Authentication
+ *
+ * @author WANGKairen
+ * @since 2023-01-06 10:34:08
  */
 @EnableWebSecurity
 public class DefaultSecurityConfig {
 
-	// @formatter:off
 	@Bean
 	SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
+		// 成功处理
+		RedirectLoginAuthenticationSuccessHandler redirectLoginAuthenticationSuccessHandler = new RedirectLoginAuthenticationSuccessHandler();
+
+		// 失败处理
+		UnauthorizedAuthenticationEntryPoint unauthorizedAuthenticationEntryPoint = new UnauthorizedAuthenticationEntryPoint();
+		AuthenticationEntryPointFailureHandler authenticationEntryPointFailureHandler = new AuthenticationEntryPointFailureHandler(unauthorizedAuthenticationEntryPoint);
+
+		// @formatter:off
 		http
+			// 所有请求
 			.authorizeRequests(authorizeRequests ->
-				authorizeRequests.anyRequest().authenticated()
+					authorizeRequests
+							// 所以请求
+							.anyRequest()
+							// 需要被认证
+							.authenticated()
 			)
-			.formLogin(withDefaults());
+
+			// 跨站请求攻击保护
+			.csrf()
+			.disable()
+
+			// Form 表单认证方式 /login 会被 UsernamePasswordAuthenticationFilter 过滤器拦截
+			.formLogin()
+
+			// 登录成功处理
+			.successHandler(redirectLoginAuthenticationSuccessHandler)
+			// 登录失败处理
+			.failureHandler(authenticationEntryPointFailureHandler)
+			//.disable()
+			//.and()
+
+			// 异常处理
+			//.exceptionHandling(exceptions ->
+			//		// 所有请求 /** 未认证，抛出异常，异常处理返回失败 Json
+			//		exceptions.authenticationEntryPoint(new UnauthorizedAuthenticationEntryPoint())
+			//)
+		;
+		// @formatter:on
 		return http.build();
 	}
-	// @formatter:on
 
 	// @formatter:off
 	@Bean
 	UserDetailsService users() {
 		UserDetails user = User.withDefaultPasswordEncoder()
-				.username("1")
-				.password("1")
+				.username("user1")
+				.password("password")
 				.roles("USER")
 				.build();
 		return new InMemoryUserDetailsManager(user);

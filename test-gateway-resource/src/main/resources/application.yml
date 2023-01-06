@@ -10,13 +10,14 @@ spring:
 #    username: root
 #    password: ciglink2020!@#
 
+
   security:
     oauth2:
       resourceserver:
         jwt:
-          #issuer-uri: http://127.0.0.1:30000/issuer
-          jwk-set-uri: http://127.0.0.1:30000/oauth2/jwks
-
+          # 不允许使用 127.0.0.1
+          issuer-uri: http://localhost:9001
+#            jwk-set-uri: http://localhost:9001/oauth2/jwks
 
 logging:
   level:

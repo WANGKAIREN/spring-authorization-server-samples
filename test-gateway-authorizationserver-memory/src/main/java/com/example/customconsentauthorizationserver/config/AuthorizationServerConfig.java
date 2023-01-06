@@ -1,21 +1,7 @@
-/*
- * Copyright 2020-2022 the original author or authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      https://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
 package com.example.customconsentauthorizationserver.config;
 
 import com.example.customconsentauthorizationserver.jose.Jwks;
+import com.example.customconsentauthorizationserver.security.UnauthorizedAuthenticationEntryPoint;
 import com.nimbusds.jose.jwk.JWKSet;
 import com.nimbusds.jose.jwk.RSAKey;
 import com.nimbusds.jose.jwk.source.JWKSource;
@@ -47,19 +33,21 @@ import org.springframework.security.web.util.matcher.RequestMatcher;
 import java.util.UUID;
 
 /**
- * @author Joe Grandja
- * @author Daniel Garnier-Moiroux
+ * 授权 Authorization
+ *
+ * @author WANGKairen
+ * @since 2023-01-06 10:34:08
  */
 @Configuration(proxyBeanMethods = false)
 public class AuthorizationServerConfig {
-	//private static final String CUSTOM_CONSENT_PAGE_URI = "/oauth2/consent";
-	//private static final String CUSTOM_CONSENT_PAGE_URI = "/oauth2/authorize";
 
 	/**
-	 * 认证 Authentication
-	 * 授权 Authorization
-	 *
 	 * 授权服务安全过滤器链
+	 * <br>
+	 * 可参考，授权服务默认配置
+	 * {@link  OAuth2AuthorizationServerConfiguration#applyDefaultSecurity(HttpSecurity)}
+	 * 端点查看
+	 * {@link AuthorizationServerSettings#builder()}
 	 *
 	 * @param http
 	 * @return
@@ -69,26 +57,45 @@ public class AuthorizationServerConfig {
 	@Order(Ordered.HIGHEST_PRECEDENCE)
 	public SecurityFilterChain authorizationServerSecurityFilterChain(HttpSecurity http) throws Exception {
 
+		// 授权服务配置
 		OAuth2AuthorizationServerConfigurer authorizationServerConfigurer = new OAuth2AuthorizationServerConfigurer();
-		authorizationServerConfigurer
-				//.authorizationEndpoint(authorizationEndpoint ->
-				//		authorizationEndpoint.consentPage(CUSTOM_CONSENT_PAGE_URI))
-				.oidc(Customizer.withDefaults());	// Enable OpenID Connect 1.0
+		// Enable OpenID Connect 1.0
+		authorizationServerConfigurer.oidc(Customizer.withDefaults());
+		// 授权服务端点
+		RequestMatcher endpointsMatcher = authorizationServerConfigurer.getEndpointsMatcher();
 
-		RequestMatcher endpointsMatcher = authorizationServerConfigurer
-				.getEndpointsMatcher();
-
+		// @formatter:off
 		http
+			// 对匹配的 HTTP 请求，基于安全考虑进行配置
 			.requestMatcher(endpointsMatcher)
+			// 授权请求
 			.authorizeRequests(authorizeRequests ->
-				authorizeRequests.anyRequest().authenticated()
+				authorizeRequests
+					// 所以请求
+					.anyRequest()
+					// 需要被认证
+					.authenticated()
 			)
-			.csrf(csrf -> csrf.ignoringRequestMatchers(endpointsMatcher))
+			// 跨站请求攻击保护
+			.csrf(csrf ->
+				csrf
+					// 忽略授权服务的端点
+					.ignoringRequestMatchers(endpointsMatcher)
+			)
+			// 异常处理
 			.exceptionHandling(exceptions ->
+				// 认证端点 /oauth2/authorize 未认证，抛出异常，异常处理重定向 /login
 				exceptions.authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/login"))
+				// 认证端点 /oauth2/authorize 未认证，抛出异常，异常处理返回失败 Json
+				//exceptions.authenticationEntryPoint(new UnauthorizedAuthenticationEntryPoint())
 			)
+			// JWT 令牌
 			.oauth2ResourceServer(OAuth2ResourceServerConfigurer::jwt)
-			.apply(authorizationServerConfigurer);
+			// 应用配置
+			.apply(authorizationServerConfigurer)
+		;
+		// @formatter:on
+		// 构建安全过滤器链
 		return http.build();
 	}
 
@@ -96,22 +103,24 @@ public class AuthorizationServerConfig {
 	@Bean
 	public RegisteredClientRepository registeredClientRepository() {
 		RegisteredClient registeredClient = RegisteredClient.withId(UUID.randomUUID().toString())
-				.clientId("messaging-client")
-				.clientSecret("{noop}secret")
-				.clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_POST)
-				.clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
-				.authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
-				.authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
-				.authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
-				.redirectUri("http://127.0.0.1:8080/login/oauth2/code/messaging-client-oidc")
-				.redirectUri("http://127.0.0.1:8080/authorized")
-				.redirectUri("http://127.0.0.1:30000/login/oauth2/code/messaging-client")
-				.scope(OidcScopes.OPENID)
-				.scope(OidcScopes.PROFILE)
-				.scope("message.read")
-				.scope("message.write")
-				.clientSettings(ClientSettings.builder().requireAuthorizationConsent(true).build())
-				.build();
+			.clientId("messaging-client")
+			.clientSecret("{noop}secret")
+			.clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_POST)
+			.clientAuthenticationMethod(ClientAuthenticationMethod.CLIENT_SECRET_BASIC)
+			// 授权码模式
+			.authorizationGrantType(AuthorizationGrantType.AUTHORIZATION_CODE)
+			// 刷新令牌
+			.authorizationGrantType(AuthorizationGrantType.REFRESH_TOKEN)
+			// 客户端凭证模式
+			.authorizationGrantType(AuthorizationGrantType.CLIENT_CREDENTIALS)
+			.redirectUri("http://127.0.0.1:30000/login/oauth2/code/messaging-client-oidc")
+			.redirectUri("http://127.0.0.1:30000/authorized")
+			.scope(OidcScopes.OPENID)
+			.scope(OidcScopes.PROFILE)
+			.scope("message.read")
+			.scope("message.write")
+			.clientSettings(ClientSettings.builder().requireAuthorizationConsent(true).build())
+			.build();
 		return new InMemoryRegisteredClientRepository(registeredClient);
 	}
 	// @formatter:on
