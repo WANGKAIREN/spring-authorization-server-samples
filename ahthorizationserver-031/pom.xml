@@ -21,6 +21,7 @@
     <module>default-authorizationserver-031</module>
     <module>federated-identity-authorizationserver-031</module>
     <module>messages-client-031</module>
+    <module>messages-resource-031</module>
   </modules>
 
   <description>ahthorizationserver-031</description>
