@@ -49,9 +49,9 @@ public class DefaultSecurityConfig {
 			.formLogin()
 
 			// 登录成功处理
-			.successHandler(redirectLoginAuthenticationSuccessHandler)
+			//.successHandler(redirectLoginAuthenticationSuccessHandler)
 			// 登录失败处理
-			.failureHandler(authenticationEntryPointFailureHandler)
+			//.failureHandler(authenticationEntryPointFailureHandler)
 			//.disable()
 			//.and()
 
