@@ -1,0 +1,11 @@
+server:
+  port: 9001
+
+logging:
+  level:
+    #    root: INFO
+    #    org.springframework.web: TRACE
+    org.springframework.security: DEBUG
+#    org.springframework.security.oauth2: DEBUG
+#    org.springframework.cloud.gateway: DEBUG
+#    org.springframework.jdbc.core: debug
