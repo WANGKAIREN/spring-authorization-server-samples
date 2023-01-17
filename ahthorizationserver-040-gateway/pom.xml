@@ -5,24 +5,23 @@
   <parent>
     <groupId>org.springframework.boot</groupId>
     <artifactId>spring-boot-starter-parent</artifactId>
-    <version>2.7.0</version>
+    <version>2.7.5</version>
     <relativePath/> <!-- lookup parent from repository -->
   </parent>
 
   <groupId>com.example</groupId>
-  <artifactId>ahthorizationserver-031</artifactId>
+  <artifactId>ahthorizationserver-040-gateway</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <packaging>pom</packaging>
-  <name>ahthorizationserver-031</name>
+  <name>ahthorizationserver-040-gateway</name>
   <url>http://maven.apache.org</url>
-  <description>ahthorizationserver-031</description>
+  <description>ahthorizationserver-040-gateway</description>
 
   <modules>
-    <module>custom-consent-authorizationserver-031</module>
-    <module>default-authorizationserver-031</module>
-    <module>federated-identity-authorizationserver-031</module>
-    <module>messages-client-031</module>
-    <module>messages-resource-031</module>
+    <module>test-gateway</module>
+    <module>test-gateway-authorizationserver-jdbc</module>
+    <module>test-gateway-authorizationserver-memory</module>
+    <module>test-gateway-resource</module>
   </modules>
 
   <properties>
