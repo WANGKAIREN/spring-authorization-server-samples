@@ -1,5 +1,6 @@
 package com.example.authenticationjwt.config;
 
+import com.example.authenticationjwt.security.JwtAuthenticationTokenFilter;
 import com.example.authenticationjwt.security.RedirectLoginAuthenticationSuccessHandler;
 import com.example.authenticationjwt.security.UnauthorizedAuthenticationEntryPoint;
 import org.springframework.context.annotation.Bean;
@@ -11,6 +12,7 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationEntryPointFailureHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 /**
  * 认证 Authentication
@@ -51,8 +53,11 @@ public class DefaultSecurityConfig {
 			.csrf()
 			.disable()
 
+			// 测试添加过滤器
+			.addFilterAt(new JwtAuthenticationTokenFilter(), UsernamePasswordAuthenticationFilter.class)
+
 			// Form 表单认证方式 /login 会被 UsernamePasswordAuthenticationFilter 过滤器拦截
-			.formLogin()
+			//.formLogin()
 			//.formLogin(withDefaults())
 			// 替换默认登录页面 .mvcMatchers("/login/**") 放行 /login?client_id=messaging-client，现在 .loginPage("/login") 永远不会触发
 			//.loginPage("/login") // loginPage 有两个功能 完全匹配放行 和 异常处理重定向 /login
@@ -77,6 +82,7 @@ public class DefaultSecurityConfig {
 			//	exceptions.authenticationEntryPoint(new ClientLoginUrlAuthenticationEntryPoint("/login"))
 			//)
 		;
+
 		// @formatter:on
 		return http.build();
 	}
