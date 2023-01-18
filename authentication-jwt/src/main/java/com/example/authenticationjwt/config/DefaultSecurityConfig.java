@@ -6,13 +6,18 @@ import com.example.authenticationjwt.security.UnauthorizedAuthenticationEntryPoi
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfiguration;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.access.ExceptionTranslationFilter;
+import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.AuthenticationEntryPointFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import javax.servlet.Filter;
 
 /**
  * 认证 Authentication
@@ -23,6 +28,22 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 @EnableWebSecurity
 public class DefaultSecurityConfig {
 
+	/**
+	 * 已开启过滤器
+	 * {@link WebSecurityConfiguration#springSecurityFilterChain()}
+	 * 过滤器顺序
+	 * {@link HttpSecurity#addFilterAt(Filter, Class)}
+	 * 用户进行登录时所使用到的过滤器
+	 * {@link UsernamePasswordAuthenticationFilter}
+	 * 认证失败，或者授权失败所抛出的异常处理的过滤器
+	 * {@link ExceptionTranslationFilter}
+	 * 授权过程中使用到的过滤器
+	 * {@link FilterSecurityInterceptor}
+	 *
+	 * @param http
+	 * @return
+	 * @throws Exception
+	 */
 	// @formatter:off
 	@Bean
 	SecurityFilterChain defaultSecurityFilterChain(HttpSecurity http) throws Exception {
@@ -40,12 +61,12 @@ public class DefaultSecurityConfig {
 				authorizeRequests
 					// 放行 /login 为了 /login?client_id=messaging-client
 					.regexMatchers("/login\\?client_id=.*")
-					// 放行匹配
-					.permitAll()
+					// 允许匿名访问，登录后不能访问
+					.anonymous()
 
 					// 所以请求
 					.anyRequest()
-					// 需要被认证
+					// 除了上面的路径，其他都需要鉴权（认证？）访问
 					.authenticated()
 			)
 
@@ -53,7 +74,12 @@ public class DefaultSecurityConfig {
 			.csrf()
 			.disable()
 
-			// 测试添加过滤器
+			/*
+			将自定义过滤器添加到与 UsernamePasswordAuthenticationFilter 相同的位置
+			过滤器有前后顺序 UsernamePasswordAuthenticationFilter 位置已在 FilterOrderRegistration 中事先定义过为 1600
+			添加自定义过滤器不覆盖 UsernamePasswordAuthenticationFilter，如果 UsernamePasswordAuthenticationFilter 存在，则顺序不确定
+			不配置 .formLogin() securityFilterChains 中则无 UsernamePasswordAuthenticationFilter
+			 */
 			.addFilterAt(new JwtAuthenticationTokenFilter(), UsernamePasswordAuthenticationFilter.class)
 
 			// Form 表单认证方式 /login 会被 UsernamePasswordAuthenticationFilter 过滤器拦截
