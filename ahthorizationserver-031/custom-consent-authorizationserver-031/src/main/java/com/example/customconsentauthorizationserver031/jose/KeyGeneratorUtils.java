@@ -33,6 +33,11 @@ final class KeyGeneratorUtils {
 	private KeyGeneratorUtils() {
 	}
 
+	/**
+	 * 单向加密 算法，不可逆加密
+	 *
+	 * @return
+	 */
 	static SecretKey generateSecretKey() {
 		SecretKey hmacKey;
 		try {
@@ -43,6 +48,15 @@ final class KeyGeneratorUtils {
 		return hmacKey;
 	}
 
+	/**
+	 * 非对称加密 算法
+	 * <br>
+	 * 生成一对密钥，公钥和私钥
+	 * 公钥加密，私钥解密
+	 * 私钥加签（签名），公钥验签
+	 *
+	 * @return
+	 */
 	static KeyPair generateRsaKey() {
 		KeyPair keyPair;
 		try {
@@ -55,6 +69,11 @@ final class KeyGeneratorUtils {
 		return keyPair;
 	}
 
+	/**
+	 * 非对称加密 算法 最高级 ECC-Elliptic Curves Cryptography
+	 *
+	 * @return
+	 */
 	static KeyPair generateEcKey() {
 		EllipticCurve ellipticCurve = new EllipticCurve(
 				new ECFieldFp(

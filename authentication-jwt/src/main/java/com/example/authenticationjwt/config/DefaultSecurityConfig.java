@@ -84,6 +84,7 @@ public class DefaultSecurityConfig {
 
 			// Form 表单认证方式 /login 会被 UsernamePasswordAuthenticationFilter 过滤器拦截
 			//.formLogin()
+			//.disable()
 			//.formLogin(withDefaults())
 			// 替换默认登录页面 .mvcMatchers("/login/**") 放行 /login?client_id=messaging-client，现在 .loginPage("/login") 永远不会触发
 			//.loginPage("/login") // loginPage 有两个功能 完全匹配放行 和 异常处理重定向 /login
