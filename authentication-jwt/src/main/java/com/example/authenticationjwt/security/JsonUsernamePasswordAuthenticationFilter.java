@@ -5,10 +5,12 @@ import com.example.authenticationjwt.utils.JacksonUtil;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.nimbusds.jose.JOSEException;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.log.LogMessage;
 import org.springframework.http.MediaType;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.AuthenticationServiceException;
+import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.authentication.event.InteractiveAuthenticationSuccessEvent;
 import org.springframework.security.core.Authentication;
@@ -18,7 +20,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.stereotype.Component;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -35,13 +36,17 @@ import java.util.Map;
  **/
 @Slf4j
 //@Component
-public class JwtAuthenticationTokenFilter extends UsernamePasswordAuthenticationFilter {
+public class JsonUsernamePasswordAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     //@Autowired
     private UserDetailsService userDetailsService;
 
     /**
      * 执行实际身份验证
+     * <br>
+     * {@link AuthenticationManager} 认证核心接口
+     * {@link ProviderManager} 认证核心接口实现，内部会维护一个 {@link AuthenticationProvider} List 列表，存放多种认证方式，实际上这是委托者模式的应用（Delegate）
+     * 多种认证方式，比如：用户名+密码 {@link UsernamePasswordAuthenticationToken} 对应一个 {@link AuthenticationProvider}
      *
      * @param request
      * @param response
@@ -66,24 +71,28 @@ public class JwtAuthenticationTokenFilter extends UsernamePasswordAuthentication
 
         // 判断是否是 JSON 格式请求类型
         if (request.getContentType().equalsIgnoreCase(MediaType.APPLICATION_JSON_VALUE)) {
+            Map<String, String> userInfo;
             try {
                 // @formatter:off
                 // 从前端提交 JSON 格式数据中获取用户输入的用户名和密码 {"username":"xxx","password":"xxx"}
-                Map<String, String> userInfo = JacksonUtil.getInstance().readValue(request.getInputStream(), new TypeReference<Map<String, String>>() {});
+                userInfo = JacksonUtil.getInstance().readValue(request.getInputStream(), new TypeReference<Map<String, String>>() {});
                 // @formatter:on
-
-                String username = userInfo.get(getUsernameParameter());
-                String password = userInfo.get(getPasswordParameter());
-
-                log.info("username: {}, password: {}", username, password);
-
-                UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(username, password);
-                // Allow subclasses to set the "details" property
-                setDetails(request, authRequest);
-                return this.getAuthenticationManager().authenticate(authRequest);
             } catch (IOException e) {
-                throw new AuthenticationServiceException("Authentication input stream i/o exception: ", e);
+                throw new AuthenticationServiceException("Authentication input stream i/o exception", e);
             }
+
+            String username = userInfo.get(getUsernameParameter());
+            username = (username != null) ? username : "";
+            username = username.trim();
+            String password = userInfo.get(getPasswordParameter());
+            password = (password != null) ? password : "";
+            log.info("username: {}, password: {}", username, password);
+
+            UsernamePasswordAuthenticationToken authRequest = new UsernamePasswordAuthenticationToken(username, password);
+            // 设置认证用户的额外信息
+            setDetails(request, authRequest);
+            // 执行 UsernamePasswordAuthenticationToken 对应的 AuthenticationProvider 认证方式
+            return this.getAuthenticationManager().authenticate(authRequest);
         }
 
         // 如果不是 JSON 格式，那么按照父类的表单登录逻辑处理

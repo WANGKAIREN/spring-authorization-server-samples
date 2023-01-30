@@ -1,6 +1,6 @@
 package com.example.authenticationjwt.config;
 
-import com.example.authenticationjwt.security.JwtAuthenticationTokenFilter;
+import com.example.authenticationjwt.security.JsonUsernamePasswordAuthenticationFilter;
 import com.example.authenticationjwt.security.RedirectLoginAuthenticationSuccessHandler;
 import com.example.authenticationjwt.security.UnauthorizedAuthenticationEntryPoint;
 import org.springframework.context.annotation.Bean;
@@ -80,7 +80,7 @@ public class DefaultSecurityConfig {
 			添加自定义过滤器不覆盖 UsernamePasswordAuthenticationFilter，如果 UsernamePasswordAuthenticationFilter 存在，则顺序不确定
 			不配置 .formLogin() securityFilterChains 中则无 UsernamePasswordAuthenticationFilter
 			 */
-			.addFilterAt(new JwtAuthenticationTokenFilter(), UsernamePasswordAuthenticationFilter.class)
+			.addFilterAt(new JsonUsernamePasswordAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
 
 			// Form 表单认证方式 /login 会被 UsernamePasswordAuthenticationFilter 过滤器拦截
 			//.formLogin()
