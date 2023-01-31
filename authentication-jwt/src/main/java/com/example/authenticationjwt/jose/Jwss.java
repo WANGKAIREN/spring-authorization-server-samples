@@ -215,7 +215,7 @@ public class Jwss implements Serializable {
         SignedJWT parseJwsObject = SignedJWT.parse(token);
 
         // 验签对象
-        JWSVerifier jwsVerifier = new MACVerifier(token);
+        JWSVerifier jwsVerifier = new MACVerifier(SECRET);
 
         // 验签
         if (!parseJwsObject.verify(jwsVerifier)) {
