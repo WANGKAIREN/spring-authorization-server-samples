@@ -1,0 +1,77 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- 继承 -->
+    <parent>
+        <groupId>com.ciglink</groupId>
+        <artifactId>ciglink-common</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <artifactId>auth-center-02</artifactId>
+    <packaging>pom</packaging>
+
+    <name>auth-center</name>
+    <description>auth-center</description>
+
+    <!-- 不继承 -->
+    <!--<groupId>com.ciglink</groupId>
+    <artifactId>auth-center</artifactId>
+    <version>1.0.0</version>
+    <packaging>pom</packaging>
+
+    <name>auth-center</name>
+    <url>https://xxx.ciglink.com</url>
+    <description>auth-center</description>-->
+
+    <!-- 模块 -->
+    <modules>
+        <module>ciglink-common</module>
+
+        <module>auth-center-authorization-server</module>
+        <module>auth-center-common</module>
+        <module>auth-center-test</module>
+    </modules>
+
+    <!-- 属性 -->
+    <properties>
+        <auth-center.version>1.0.0</auth-center.version>
+    </properties>
+
+    <!-- 管理依赖版本号 依赖声明 -->
+    <dependencyManagement>
+        <dependencies>
+            <!-- 不继承 Ciglink Common -->
+            <!--
+            <dependency>
+                <groupId>com.ciglink</groupId>
+                <artifactId>ciglink-common-core</artifactId>
+                <version>${ciglink.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            -->
+
+            <!-- Auth Center -->
+            <dependency>
+                <groupId>com.ciglink</groupId>
+                <artifactId>auth-center-common-core</artifactId>
+                <version>${auth-center.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ciglink</groupId>
+                <artifactId>auth-center-common-resource</artifactId>
+                <version>${auth-center.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <!-- Mysql Connector -->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+        </dependency>
+    </dependencies>
+</project>

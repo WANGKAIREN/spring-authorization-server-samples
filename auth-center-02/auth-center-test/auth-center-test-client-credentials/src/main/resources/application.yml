@@ -1,0 +1,28 @@
+server:
+  port: 8100
+
+logging:
+  level:
+#    root: INFO
+#    org.springframework.web: INFO
+#    org.springframework.security: INFO
+    org.springframework.security.oauth2: TRACE
+#    org.springframework.boot.autoconfigure: DEBUG
+
+spring:
+  security:
+    oauth2:
+      client:
+        registration:
+          # 客户端名称
+          messaging-client-client-credentials:
+            provider: spring
+            client-id: messaging-client
+            client-secret: secret
+            authorization-grant-type: client_credentials
+            scope: message.read,message.write
+            # 客户端名称
+            client-name: messaging-client-client-credentials
+        provider:
+          spring:
+            issuer-uri: http://localhost:9001

@@ -1,0 +1,21 @@
+server:
+  port: 8090
+
+logging:
+  level:
+    root: INFO
+#    org.springframework.web: INFO
+    org.springframework.security: TRACE
+    org.springframework.security.oauth2: TRACE
+#    org.springframework.boot.autoconfigure: DEBUG
+
+spring:
+  application:
+    name: auth-center-resource-test
+
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          # 获取公钥的地址，验证token需使用，系统启动时会初始化，不会每次验证都请求
+          issuer-uri: http://localhost:9001

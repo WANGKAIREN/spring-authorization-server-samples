@@ -1,0 +1,146 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.ciglink</groupId>
+    <artifactId>ciglink-common</artifactId>
+    <version>1.0.0</version>
+    <packaging>pom</packaging>
+
+    <name>ciglink-common</name>
+    <url>https://xxx.ciglink.com</url>
+    <description>ciglink通用模块</description>
+
+    <modules>
+        <module>ciglink-common-core</module>
+        <module>ciglink-common-web</module>
+        <module>ciglink-common-datasource</module>
+        <module>ciglink-common-security</module>
+    </modules>
+
+    <properties>
+        <java.version>1.8</java.version>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <!-- version-->
+
+        <!-- SpringBoot -->
+        <spring-boot.version>2.6.8</spring-boot.version>
+        <!-- Spring 授权服务器 -->
+        <spring-authorization-server.version>0.3.1</spring-authorization-server.version>
+        <!--  -->
+        <dynamic-ds.version>3.5.1</dynamic-ds.version>
+
+        <!-- Mybatis-Plus -->
+        <mybatisplus-plus-version>1.7.0-RELEASE</mybatisplus-plus-version>
+        <!-- Mybatis-Plus-Plus -->
+        <spring-boot.mybatis-plus>3.5.1</spring-boot.mybatis-plus>
+
+        <!-- Jackson JSON 类库 -->
+        <jackson.version>2.11.0.rc1</jackson.version>
+        <!-- Hutool 工具类库 -->
+        <hutool-all.version>5.7.16</hutool-all.version>
+        <!-- Commons FileUpload 工具类库 -->
+        <commons.fileupload.version>1.4</commons.fileupload.version>
+
+        <!-- Ciglink Common -->
+        <ciglink.version>1.0.0</ciglink.version>
+    </properties>
+
+    <!-- 管理依赖版本号 依赖声明 -->
+    <dependencyManagement>
+        <dependencies>
+            <!-- SpringBoot -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <!-- Spring 授权服务器 -->
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-oauth2-authorization-server</artifactId>
+                <version>${spring-authorization-server.version}</version>
+            </dependency>
+
+
+            <!-- Mybatis-Plus 添加此依赖必须立即配置数据源 -->
+            <dependency>
+                <groupId>com.baomidou</groupId>
+                <artifactId>mybatis-plus-boot-starter</artifactId>
+                <version>${spring-boot.mybatis-plus}</version>
+            </dependency>
+            <!-- Mybatis-Plus-Plus 添加此依赖必须立即配置数据源 -->
+            <dependency>
+                <groupId>com.github.jeffreyning</groupId>
+                <artifactId>mybatisplus-plus</artifactId>
+                <version>${mybatisplus-plus-version}</version>
+            </dependency>
+
+            <!-- Jackson JSON 类库 -->
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-annotations</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+            <!-- Hutool 工具类库 -->
+            <dependency>
+                <groupId>cn.hutool</groupId>
+                <artifactId>hutool-all</artifactId>
+                <version>${hutool-all.version}</version>
+            </dependency>
+            <!-- Commons FileUpload 工具类库 -->
+            <dependency>
+                <groupId>commons-fileupload</groupId>
+                <artifactId>commons-fileupload</artifactId>
+                <version>${commons.fileupload.version}</version>
+            </dependency>
+
+            <!-- Ciglink Common -->
+            <dependency>
+                <groupId>com.ciglink</groupId>
+                <artifactId>ciglink-common-core</artifactId>
+                <version>${ciglink.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ciglink</groupId>
+                <artifactId>ciglink-common-web</artifactId>
+                <version>${ciglink.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ciglink</groupId>
+                <artifactId>ciglink-common-datasource</artifactId>
+                <version>${ciglink.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <!-- 全局依赖 -->
+    <dependencies>
+        <!-- Lombok 工具类库 -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+        <!-- Hutool 工具类库 -->
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+        </dependency>
+    </dependencies>
+</project>

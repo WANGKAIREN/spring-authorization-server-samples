@@ -1,0 +1,43 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.ciglink</groupId>
+        <artifactId>ciglink-common</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <artifactId>ciglink-common-web</artifactId>
+
+    <name>ciglink-common-web</name>
+    <description>csp-common-web通信模块</description>
+
+    <dependencies>
+        <!-- Spring Web -->
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+        </dependency>
+
+        <!-- Java Servlet -->
+        <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>javax.servlet-api</artifactId>
+        </dependency>
+
+        <!-- Ciglink Common -->
+        <dependency>
+            <groupId>com.ciglink</groupId>
+            <artifactId>ciglink-common-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.ciglink</groupId>
+            <artifactId>ciglink-common-datasource</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.ciglink</groupId>
+            <artifactId>ciglink-common-web</artifactId>
+        </dependency>
+    </dependencies>
+</project>
