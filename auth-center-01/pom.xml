@@ -1,0 +1,90 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.ciglink</groupId>
+    <artifactId>auth-center-01</artifactId>
+    <version>1.0.0</version>
+    <packaging>pom</packaging>
+
+    <name>auth-center</name>
+    <url>https://xxx.ciglink.com</url>
+    <description>auth-center</description>
+
+    <modules>
+        <module>auth-center-authorization-server</module>
+        <module>auth-center-common</module>
+        <module>auth-center-test</module>
+        <module>ciglink-common</module>
+    </modules>
+
+    <properties>
+        <java.version>1.8</java.version>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+
+        <!-- version-->
+        <spring-boot.version>2.6.8</spring-boot.version>
+        <spring-authorization-server.version>0.3.1</spring-authorization-server.version>
+        <hutool-all.version>5.7.16</hutool-all.version>
+        <auth-center.version>1.0.0</auth-center.version>
+        <ciglink.version>1.0.0</ciglink.version>
+    </properties>
+
+    <!-- 管理依赖版本号 依赖声明 -->
+    <dependencyManagement>
+        <dependencies>
+            <!-- SpringBoot -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- Spring 授权服务器 -->
+            <dependency>
+                <groupId>org.springframework.security</groupId>
+                <artifactId>spring-security-oauth2-authorization-server</artifactId>
+                <version>${spring-authorization-server.version}</version>
+            </dependency>
+
+            <!-- 工具类库 -->
+            <dependency>
+                <groupId>cn.hutool</groupId>
+                <artifactId>hutool-all</artifactId>
+                <version>${hutool-all.version}</version>
+            </dependency>
+
+            <!-- Auth Center -->
+            <dependency>
+                <groupId>com.ciglink</groupId>
+                <artifactId>auth-center-common-core</artifactId>
+                <version>${auth-center.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.ciglink</groupId>
+                <artifactId>auth-center-common-resource</artifactId>
+                <version>${auth-center.version}</version>
+            </dependency>
+
+            <!-- Ciglink -->
+            <dependency>
+                <groupId>com.ciglink</groupId>
+                <artifactId>ciglink-common-core</artifactId>
+                <version>${ciglink.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <!-- 工具类库 -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+    </dependencies>
+</project>

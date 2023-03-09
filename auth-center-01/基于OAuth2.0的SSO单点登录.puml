@@ -1,0 +1,398 @@
+@startuml "IOT时序图 备份 只能Copy 2023-01-09 16:32:09 完成"
+    actor 用户
+
+    ' 外综服
+    用户 -> "前端（客户端）" : 访问任何页面，都会最终重定向回任何页面
+
+    "前端（客户端）" -> "后端（校验资源）" : /admin/home/page/option/get.do
+    "前端（客户端）" <- "后端（校验资源）" : 返回 全局枚举 Json \n {"success":false,"resultCode":"101","resultMsg":"未登录"}
+
+    "前端（客户端）" -> "后端（校验资源）" : /admin/page/column/config/data/get.do
+    "前端（客户端）" <- "后端（校验资源）" : 返回 用户字段显示/隐藏 Json 表数据 \n {"success":false,"resultCode":"101","resultMsg":"未登录"}
+
+    "前端（客户端）" -> "后端（无校验资源）" : /admin/login/url/get.do?url=https://当前域名:当前端口/当前用户访问的菜单页面API地址 \n 或者可以改为访问授权服务器
+    "前端（客户端）" <- "后端（无校验资源）" : 返回 客户端表数据（包含、单点登录页、应用名等）
+     note left
+      1. 例 url = http://admin.pre.btone.cn:8501/iot/admin/order/make-card
+      2. url == null 则 配置文件 可配置默认 url
+      3. 通道 new URL() 格式化 url 去掉 http:// 为 admin.pre.btone.cn/iot/admin/order/make-card
+      4. 取数据库
+      5. 取数据库如果为空则 while 循环 取数据库
+          admin.pre.btone.cn/iot/admin/order/make-card
+          admin.pre.btone.cn/iot/admin/order
+          admin.pre.btone.cn/iot/admin
+          admin.pre.btone.cn/iot
+          admin.pre.btone.cn
+      6. 取 /iot/admin/order/make-card
+          http://admin.pre.btone.cn:8501/iot/admin?redirectUrl=/admin/order/make-card
+    end note
+
+    用户 <- "前端（客户端）" : 前端提示：需要重新登录 点击确定前往登录页！ \n  http:~//admin.pre.btone.cn:7001/?hrefs=http://admin.pre.btone.cn:8501/iot/admin/order/make-card/&appName=iotAdminWeb
+
+    ' 授权服务器
+    "前端（客户端）" -> "授权服务器 前端（登录页）" : 重定向 http:~//域名:端口/?hrefs=http://当前域名:当前端口/当前地址/&appName=应用名
+
+    "授权服务器前端（登录页）" -> "授权服务器 后端（校验资源）" : /sso/auth/validate.do
+    "授权服务器前端（登录页）" <- "授权服务器 后端（校验资源）" : 返回 校验头 Token \n {"success":false,"resultCode":"101","resultMsg":"登录已失效"}
+
+    "授权服务器前端（登录页）" -> "授权服务器 后端（无校验资源）" : /sso/captcha/slide/get.do
+    "授权服务器前端（登录页）" <- "授权服务器 后端（无校验资源）" : 返回 验证图片 \n Redis Key 等
+
+    "授权服务器前端（登录页）" -> "授权服务器 后端（无校验资源）" : /sso/login/page/parms/get.do?url=http://前端（客户端）域名:前端（客户端）端口/前端（客户端）地址/
+    "授权服务器前端（登录页）" <- "授权服务器 后端（无校验资源）" : 返回 客户端表数据（包含、单点登录页、登录页图片、回跳目标地址等）
+
+    "授权服务器前端（登录页）" -> 用户 : 展示当前应用的个性化登录页面
+
+    ' 用户
+    "授权服务器前端（登录页）" <- 用户 : 输入账号密码
+    "授权服务器前端（登录页）" <- 用户 : 输入验证码
+
+    "授权服务器前端（登录页）" <- 用户 : 校验验证码操作
+
+    "授权服务器前端（登录页）" -> "授权服务器 后端（无校验资源）" : /sso/captcha/slide/verify.do
+    "授权服务器前端（登录页）" <- "授权服务器 后端（无校验资源）" : 返回 校验 验证图片 \n {"success":false,"resultCode":"1","resultMsg":"图形验证码失效","data":null,"failed":true} 校验失败/校验成功
+
+    "授权服务器前端（登录页）" -> 用户 : 前端提示：校验验证码 成功！
+    "授权服务器前端（登录页）" <- 用户 : 点击登录操作
+
+    ' 授权服务器
+    "授权服务器前端（登录页）" -> "授权服务器 后端（无校验资源）" : /sso/current/time/get.do
+    "授权服务器前端（登录页）" <- "授权服务器 后端（无校验资源）" : 返回 时间戳
+
+    "授权服务器前端（登录页）" -> "授权服务器 后端（无校验资源）" : /sso/login.do
+    "授权服务器前端（登录页）" <- "授权服务器 后端（无校验资源）" : 返回 登录结果 \n {"success":false,"resultCode":"1","resultMsg":"验证码不正确","data":null,"failed":true} 登录成功等
+
+    ' 前端（客户端）
+    "授权服务器前端（登录页）" -> "前端（客户端）" : 重定向 http://前端（客户端）域名:前端（客户端）端口/admin/?token=令牌
+
+    "前端（客户端）" -> "后端（无校验资源）" : /admin/login/url/get.do?url=https://当前域名:当前端口/当前用户访问的菜单页面API地址 \n 或者可以改为访问授权服务器
+    "前端（客户端）" <- "后端（无校验资源）" : 返回 客户端表数据（包含、单点登录页、应用名等）
+
+    "前端（客户端）" -> "授权服务器 后端（校验资源）" : /sso/current/user/get.do?appName=应用名，根据 客户端表数据 的 授权服务器地址 组装前端固定地址，访问接口
+    "前端（客户端）" <- "授权服务器 后端（校验资源）" : 返回 用户页面权限
+
+    "前端（客户端）" -> "后端（校验资源）" : /admin/home/page/option/get.do
+    "前端（客户端）" <- "后端（校验资源）" : 返回 全局枚举 Json
+
+    "前端（客户端）" -> "后端（校验资源）" : /admin/page/column/config/data/get.do
+    "前端（客户端）" <- "后端（校验资源）" : 返回 用户字段显示/隐藏 Json 表数据
+
+    "前端（客户端）" -> "后端（校验资源）" : /admin/make/card/order/list.do
+    "前端（客户端）" <- "后端（校验资源）" : 返回 列表数据
+
+    用户 <- "前端（客户端）" : 展示列表数据
+
+    ' 需要完成：
+    ' 退出 需要 重定向 授权服务器前端（登录页）
+    ' 不管访问哪个页面 登录后 还需要 重定向到 哪个页面
+    ' http://admin.pre.btone.cn:8501/iot/admin/order/make-card
+    ' 授权服务器的认证 session id 要改 JWT
+
+    ' 获取授权码返回Json
+    ' DefaultRedirectStrategy implements RedirectStrategy 重写它，Code Json 返回
+    ' OAuth2AuthorizationEndpointFilter 311 186
+
+    ' 授权页面
+    ' OAuth2AuthorizationEndpointFilter 180
+
+    ' 关闭 授权页面
+    ' 重定向回时，参数带列表地址
+
+    ' http:~//授权服务器域名:授权服务器端口/授权服务器API/?hrefs=https://csp.ciglink.com/declare?client_id=csp-client
+
+@enduml
+
+
+@startuml "CSP时序图 2023-01-10 09:57:05 2"
+    actor 用户
+
+    skinparam ParticipantPadding 40
+    skinparam BoxPadding 20
+
+    box "外综服 \n 网关只做路由 \n 前端定时刷新 Token"
+    participant "外综服 前端（客户端）"
+    participant "外综服 后端（校验资源）"
+    end box
+
+    box "授权服务器 \n Spring Boot 2.6.8 + spring-security-oauth2-authorization-server 0.3.1"
+    participant "授权服务器 后端（无校验资源）"
+    participant "授权服务器 后端（客户端授权端点）"
+    participant "授权服务器 后端（用户认证授权）"
+    participant "授权服务器 前端（登录页）"
+    end box
+
+    ' 外综服
+    "用户" -> "外综服 前端（客户端）" : 访问首页或其它列表，最终都会重定向回原地址 \n 登录页面 https://csp.ciglink.com/login?redirect=/ \n 报关明细 https://csp.ciglink.com/details \n 报关首页 https://csp.ciglink.com/declare
+
+    "外综服 前端（客户端）" -> "外综服 前端（客户端）" : 判断无 Token
+
+    "外综服 前端（客户端）" -> "外综服 后端（校验资源）" : 获取 用户信息 /api/system/user/getInfo
+    "外综服 前端（客户端）" <- "外综服 后端（校验资源）" : 返回 {"success":false,"resultCode":"101","resultMsg":"未登录"}
+
+    "外综服 前端（客户端）" -> "授权服务器 后端（无校验资源）" : 获取 客户端表数据 根据 客户端ID /authorizationserver/client/login/clientid/get.do?clientid=客户端ID
+    "外综服 前端（客户端）" <- "授权服务器 后端（无校验资源）" : 返回 授权服务器登录页、客户端 ID、密钥等
+
+    note left
+        可以前端写死客户端授权配置，不用根据 客户端ID 获取
+    end note
+
+    "用户" <- "外综服 前端（客户端）" : 前端弹窗提示：需要重新登录 点击确定前往登录页！
+
+    ' 授权服务器
+    "外综服 前端（客户端）" -> "授权服务器 后端（客户端授权端点）" : 重定向 授权端点 http:~//授权服务器域名:授权服务器端口/oauth2/authorize
+    "授权服务器 后端（客户端授权端点）" -> "授权服务器 后端（客户端授权端点）" : 认证操作 判断用户未登录
+    "授权服务器 后端（客户端授权端点）" -> "授权服务器 前端（登录页）" : 重定向 /login?clientid=客户端ID
+
+    note left
+        先访问后端 -> 后端判断未认证 -> 重定向前端
+    end note
+
+    "授权服务器 后端（无校验资源）" <- "授权服务器 前端（登录页）" : 获取 客户端表数据 根据 客户端ID /authorizationserver/client/login/clientid/get.do?clientid=客户端ID
+    "授权服务器 后端（无校验资源）" -> "授权服务器 前端（登录页）" : 返回 客户端个性化登录页面图片等
+
+    "用户" <- "授权服务器 前端（登录页）" : 展示登录页
+    "用户" -> "授权服务器 前端（登录页）" : 输入账号密码 登录操作
+
+    "授权服务器 后端（用户认证授权）" <- "授权服务器 前端（登录页）" : 帐号密码 提交到后端 /login.do
+
+    note left
+        后端默认认证是 ThreadLocal + Session，需要实现 JWT + Redis
+        此认证为 Spring Security 用户认证 区别于 Spring Authorization Server 客户端授权
+    end note
+
+    "授权服务器 后端（用户认证授权）" -> "授权服务器 后端（用户认证授权）" : 认证操作 判断用户已登录
+    "授权服务器 后端（用户认证授权）" -> "授权服务器 后端（用户认证授权）" : 授权操作 判断用户是否具有相应有角色 roles 权限
+
+    "授权服务器 后端（用户认证授权）" -> "授权服务器 前端（登录页）" : 返回 {"code":200,"data":{"targetUrl":"授权端点 http:~//授权服务器域名:授权服务器端口/oauth2/authorize"},"msg":"登录成功！","identifier":true}
+
+    "授权服务器 后端（客户端授权端点）" <- "授权服务器 前端（登录页）" : 重定向 授权端点 http:~//授权服务器域名:授权服务器端口/oauth2/authorize
+    "授权服务器 后端（客户端授权端点）" -> "授权服务器 后端（客户端授权端点）" : 认证操作 判断用户已登录
+    "授权服务器 后端（客户端授权端点）" -> "授权服务器 后端（客户端授权端点）" : 授权操作 判断用户未同意
+    "授权服务器 后端（客户端授权端点）" -> "授权服务器 前端（登录页）" : 返回 默认同意页面
+
+    note left
+        同意页面需要取消这一步不再显示
+    end note
+
+    "用户" <- "授权服务器 前端（登录页）" : 展示同意页
+    "用户" -> "授权服务器 前端（登录页）" : 勾选 scops 同意操作
+
+    "授权服务器 后端（客户端授权端点）" <- "授权服务器 前端（登录页）" : scops 提交到后端 授权端点 http:~//授权服务器域名:授权服务器端口/oauth2/authorize
+    "授权服务器 后端（客户端授权端点）" -> "授权服务器 后端（客户端授权端点）" : 认证操作 判断用户已登录
+    "授权服务器 后端（客户端授权端点）" -> "授权服务器 后端（客户端授权端点）" : 授权操作 判断用户已同意
+    "授权服务器 后端（客户端授权端点）" -> "外综服 前端（客户端）" : 重定向 https://csp.ciglink.com?code=授权码
+
+    "外综服 前端（客户端）" -> "授权服务器 后端（客户端授权端点）" : 获取 Token http:~//授权服务器域名:授权服务器端口/oauth2/token
+    "外综服 前端（客户端）" <- "授权服务器 后端（客户端授权端点）" : 返回 Token
+
+    "用户" <- "外综服 前端（客户端）" : 展示首页
+
+    "用户" -> "外综服 前端（客户端）" : 点击列表
+
+    "外综服 前端（客户端）" -> "外综服 后端（校验资源）" : 获取 资源
+
+    "外综服 后端（校验资源）" -> "授权服务器 后端（客户端授权端点）" : 获取 Token 解析 http:~//授权服务器域名:授权服务器端口/oauth2/jwks
+    "外综服 后端（校验资源）" <- "授权服务器 后端（客户端授权端点）" : 返回 解析结果
+    "外综服 后端（校验资源）" -> "外综服 后端（校验资源）" : 缓存 解析结果
+    "外综服 后端（校验资源）" -> "外综服 后端（校验资源）" : 判断 资源权限
+
+    "外综服 前端（客户端）" <- "外综服 后端（校验资源）" : 返回 资源
+
+    "用户" <- "外综服 前端（客户端）" : 展示列表
+
+
+@enduml
+
+@startuml Oauth2令牌颁发之授权码模式
+    title Oauth2令牌颁发之授权码模式
+
+    actor User as user
+    participant "User Agent" as userAgent
+    participant "Client" as client
+    participant "Auth Login" as login
+    participant "Auth Server" as server
+
+    autonumber
+    user->userAgent:访问客户端
+    activate userAgent
+    userAgent->login:重定向到授权页面+clientId+redirectUrl
+    activate login
+    login->server:用户名+密码+clientId+redirectUrl
+    activate server
+    server-->login:返回授权码
+    login-->userAgent:重定向到redirectUrl+授权码code
+    deactivate login
+    userAgent->client:使用授权码code换取令牌
+    activate client
+    client->server:授权码code+clientId+clientSecret
+    server-->client:颁发访问令牌accessToken+refreshToken
+    deactivate server
+    client-->userAgent:返回访问和刷新令牌
+    deactivate client
+    userAgent--> user:令牌颁发完成
+    deactivate userAgent
+@enduml
+
+@startuml 基于OAuth2.0实现的SSO单点登录
+    ' 需要解决问题
+    ' 无
+
+    title 基于OAuth2.0实现的SSO单点登录
+    ' 自动生成序号
+    autonumber
+    ' 角色
+    actor 用户
+
+    group 判断 Token 失效，提示用户重新登录
+        "用户" -> "外综服 前端（客户端）" : 访问首页或其它列表 \n 报关首页 https://csp.ciglink.com/declare \n 报关明细 https://csp.ciglink.com/details
+            note left : 重定向到授权服务器，进行登录后，需要重定向回原地址
+            ' 生命线
+            activate "外综服 前端（客户端）"
+
+        "外综服 前端（客户端）" -> "外综服 前端（客户端）" : 判断有 Token
+
+        group 网关转发 获取用户信息表数据
+            "外综服 前端（客户端）" -> "网关" : 获取用户信息表数据 \n /api/authorizationserver/user/getInfo
+                activate "网关"
+                note left
+                    1. 需要确定是访问 "外综服 后端（校验资源）" 还是 "授权服务器 后端（验资源）"
+                    2. 如果 "外综服 后端（校验资源）" 则需要 客户端凭证模式，最好直接，不包装
+                    3. 如果 "授权服务器 后端（验资源）" 则需要 授权服务器 和 资源服务器 整合
+                        要拿 授权 Token 去访问资源，原不是依靠 Oauth2 用户登录后的 JWT，去拿资源
+                end note
+
+            "网关" -> "授权服务器 后端（校验资源）" : 转发 获取用户信息表数据 \n /api/authorizationserver/user/getInfo
+                activate "授权服务器 后端（校验资源）"
+
+            "网关" <-- "授权服务器 后端（校验资源）" : 返回失败 JSON \n {"success":false,"resultCode":"102","resultMsg":"Token失效"}
+                deactivate "授权服务器 后端（校验资源）"
+
+            "外综服 前端（客户端）" <-- "网关" : 转发 返回失败 JSON \n {"success":false,"resultCode":"102","resultMsg":"Token失效"}
+                deactivate "网关"
+        end
+
+        "用户" <-- "外综服 前端（客户端）" : 前端弹窗提示：需要重新登录 点击确定前往登录页！
+            deactivate "外综服 前端（客户端）"
+    end
+
+    group 前往登录页
+        "用户" -> "外综服 前端（客户端）" : 点击确定前往登录页
+            activate "外综服 前端（客户端）"
+
+        "外综服 前端（客户端）" -> "授权服务器 后端（客户端授权端点）" : 重定向授权端点 \n https:~//授权服务器域名:授权服务器端口/oauth2/authorize
+            deactivate "外综服 前端（客户端）"
+            activate "授权服务器 后端（客户端授权端点）"
+            note left : 重定向是否还需要经过网关？
+
+        "授权服务器 后端（客户端授权端点）" -> "授权服务器 后端（客户端授权端点）" : 端点认证效验 判断用户未登录
+
+        "授权服务器 后端（客户端授权端点）" -> "授权服务器 前端（登录页）" : 重定向登录页 \n https:~//授权服务器域名:授权服务器端口/login?clientid=客户端ID
+            deactivate "授权服务器 后端（客户端授权端点）"
+            activate "授权服务器 前端（登录页）"
+            note left : 使用 https:// 应该可以直接重定向到前端页面，不需要后端 @Controller 返回一个页面
+
+        group 网关转发 获取客户端登录页表数据
+            "授权服务器 前端（登录页）" -> "网关" : 获取客户端登录页表数据
+                activate "网关"
+            "网关" -> "授权服务器 后端（无校验资源）" : 转发 获取客户端登录页表数据
+                activate "授权服务器 后端（无校验资源）"
+            "授权服务器 后端（无校验资源）" --> "网关" : 返回成功 JSON
+                deactivate "授权服务器 后端（无校验资源）"
+            "网关" --> "授权服务器 前端（登录页）" : 转发 返回成功 JSON
+                deactivate "网关"
+        end
+
+        "授权服务器 前端（登录页）" --> "用户" : 展示登录页
+            deactivate "授权服务器 前端（登录页）"
+    end
+
+    group 点击登录
+        "用户" -> "授权服务器 前端（登录页）" : 输入账号密码 点击登录
+            activate "授权服务器 前端（登录页）"
+
+        group 网关转发 提交 帐号密码 到后端 处理登录请求
+            "授权服务器 前端（登录页）" -> "网关" : 提交 帐号密码 到后端 处理登录请求 \n /api/authorizationserver/oauth2/login/processing
+                activate "网关"
+
+            "网关" -> "授权服务器 后端（用户认证授权）" : 转发 提交 帐号密码 到后端 处理登录请求 \n /api/authorizationserver/oauth2/login/processing
+                activate "授权服务器 后端（用户认证授权）"
+                    note left
+                        后端默认认证是 ThreadLocal + Session，需要实现 JWT + Redis
+                        此认证为 Spring Security 用户认证 区别于 Spring Authorization Server 客户端授权
+                        私钥在认证服务 公钥在资源服务
+                    end note
+
+            "授权服务器 后端（用户认证授权）" -> "授权服务器 后端（用户认证授权）" : Spring Security 认证 判断用户已登录
+
+            "授权服务器 后端（用户认证授权）" -> "授权服务器 后端（用户认证授权）" : Spring Security 授权 判断用户且有相应 roles 角色权限
+
+            "授权服务器 后端（用户认证授权）" --> "网关" : 返回成功 JSON \n {"code":200,"data":{"targetUrl":"https:~//授权服务器域名:授权服务器端口/oauth2/authorize"},"msg":"登录成功！","identifier":true}
+                deactivate "授权服务器 后端（用户认证授权）"
+
+            "网关" --> "授权服务器 前端（登录页）" : 转发返回成功 JSON \n {"code":200,"data":{"targetUrl":"https:~//授权服务器域名:授权服务器端口/oauth2/authorize"},"msg":"登录成功！","identifier":true}
+                deactivate "网关"
+        end
+
+        "授权服务器 前端（登录页）" -> "授权服务器 后端（客户端授权端点）" : 重定向授权端点 \n https:~//授权服务器域名:授权服务器端口/oauth2/authorize
+            deactivate "授权服务器 前端（登录页）"
+            activate "授权服务器 后端（客户端授权端点）"
+
+        "授权服务器 后端（客户端授权端点）" -> "授权服务器 后端（客户端授权端点）" : Authorication Server 认证 判断用户已登录
+
+        group 客户端请求访问时 不需要 Authorization Consent 授权同意 require-authorization-consent = 1 and 0 or true and false
+
+            "授权服务器 后端（客户端授权端点）" -> "授权服务器 后端（客户端授权端点）" : Authorication Server 授权 判断用户未同意 scope
+
+            "授权服务器 后端（客户端授权端点）" --> "授权服务器 前端（登录页）" : 返回 /oauth2/consent 同意页面
+                activate "授权服务器 前端（登录页）"
+
+            "授权服务器 前端（登录页）" --> "用户" : 展示同意页
+                deactivate "授权服务器 前端（登录页）"
+
+            "用户" -> "授权服务器 前端（登录页）" : 勾选 scope 点击同意
+                activate "授权服务器 前端（登录页）"
+
+            "授权服务器 前端（登录页）" -> "授权服务器 后端（客户端授权端点）" : 提交 同意 到后端 授权端点 \n /oauth2/authorize
+                deactivate "授权服务器 前端（登录页）"
+
+            "授权服务器 后端（客户端授权端点）" -> "授权服务器 后端（客户端授权端点）" : Authorication Server 认证 判断用户已登录
+        end
+
+        "授权服务器 后端（客户端授权端点）" -> "授权服务器 后端（客户端授权端点）" : Authorication Server 授权 判断用户已同意 scope
+
+        "授权服务器 后端（客户端授权端点）" --> "外综服 前端（客户端）" : 重定向客户端授权码接收页\目标页 \n https://csp.ciglink.com?code=授权码
+            deactivate "授权服务器 后端（客户端授权端点）"
+            activate "外综服 前端（客户端）"
+
+        group 网关转发 获取 Token
+            "外综服 前端（客户端）" -> "网关" : 获取 Token \n /api/authorizationserver/oauth2/token
+                activate "网关"
+
+            "网关" -> "授权服务器 后端（客户端授权端点）" : 转发 获取 Token \n /api/authorizationserver/oauth2/token
+                activate "授权服务器 后端（客户端授权端点）"
+
+            "授权服务器 后端（客户端授权端点）" --> "网关" : 返回成功 JSON
+                deactivate "授权服务器 后端（客户端授权端点）"
+
+            "网关" --> "外综服 前端（客户端）" : 转发 返回成功 JSON
+                deactivate "网关"
+        end
+
+        group 网关转发 获取资源
+            "外综服 前端（客户端）" -> "网关" : 获取用户信息表数据 \n /api/authorizationserver/user/getInfo
+                activate "网关"
+
+            "网关" -> "授权服务器 后端（校验资源）" : 转发 获取用户信息表数据 \n /api/authorizationserver/user/getInfo
+                activate "授权服务器 后端（校验资源）"
+
+            "网关" <-- "授权服务器 后端（校验资源）" : 返回成功 JSON
+                deactivate "授权服务器 后端（校验资源）"
+
+            "外综服 前端（客户端）" <-- "网关" : 转发 返回成功 JSON
+                deactivate "网关"
+        end
+
+        "外综服 前端（客户端）" --> "用户" : 展示首页
+            deactivate "外综服 前端（客户端）"
+    end
+@enduml

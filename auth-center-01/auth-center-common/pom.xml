@@ -1,0 +1,21 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.ciglink</groupId>
+        <artifactId>auth-center-01</artifactId>
+        <version>1.0.0</version>
+    </parent>
+
+    <artifactId>auth-center-common</artifactId>
+    <packaging>pom</packaging>
+
+    <name>auth-center-common</name>
+    <description>auth-center通用模块</description>
+
+    <modules>
+        <module>auth-center-common-core</module>
+        <module>auth-center-common-resource</module>
+    </modules>
+</project>
