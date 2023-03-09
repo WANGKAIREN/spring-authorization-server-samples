@@ -12,10 +12,11 @@
     <description>auth-center</description>
 
     <modules>
+        <module>ciglink-common</module>
+
         <module>auth-center-authorization-server</module>
         <module>auth-center-common</module>
         <module>auth-center-test</module>
-        <module>ciglink-common</module>
     </modules>
 
     <properties>
