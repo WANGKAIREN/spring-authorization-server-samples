@@ -1,0 +1,49 @@
+# Tomcat
+server:
+  port: 9500
+
+# Spring
+spring: 
+  application:
+    # 应用名称
+    name: csp-authorizationserver
+  profiles:
+    # 环境配置
+    active: ${spring.profiles.active}
+  servlet:
+    multipart:
+      max-request-size: 200MB
+      max-file-size: 1024MB
+  cloud:
+    nacos:
+      discovery:
+        # 服务注册地址
+        server-addr: ${nacos.server.addr}
+        namespace: ${nacos.server.namespace}
+      config:
+        # 配置中心地址
+        server-addr: ${nacos.server.addr}
+        # 配置文件格式
+        file-extension: yml
+        # 命名空间
+        namespace: ${nacos.server.namespace}
+        # 共享配置
+        shared-configs:
+          - csp-common-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
+          - csp-common-secret-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
+          - csp-common-datasource-${spring.profiles.active}.${spring.cloud.nacos.config.file-extension}
+  thymeleaf:
+    # thymeleaf 前缀、后缀修改后立即生效，缓存设置为 false
+    cache: false
+    # 前缀
+    prefix: classpath:/templates/
+    # 后缀
+    suffix: .html
+
+logging:
+  level:
+    org.springframework.web: trace
+    org.springframework.security.oauth2: debug
+    org.springframework.jdbc.core: debug
+    org.springframework.security: trace
+
